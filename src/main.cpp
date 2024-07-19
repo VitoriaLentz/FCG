@@ -23,9 +23,15 @@
 #include "matrices.h"
 
 float g_ScreenRatio = 1.0f;
+bool g_LeftMouseButtonPressed = false;
+float g_CameraDistance = 3.5f;
 
 void ErrorCallback(int error, const char* description);
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 int main(int argc, char* argv[])
 {
@@ -40,9 +46,6 @@ int main(int argc, char* argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-    #ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    #endif
 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     GLFWwindow* window;
@@ -54,12 +57,14 @@ int main(int argc, char* argv[])
         std::exit(EXIT_FAILURE);
     }
 
-    glfwSetWindowSize(window, 800, 800);
+    glfwSetKeyCallback(window, KeyCallback);
+    glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    glfwSetCursorPosCallback(window, CursorPosCallback);
+    glfwSetScrollCallback(window, ScrollCallback);
     glfwMakeContextCurrent(window);
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-
     glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
-    FramebufferSizeCallback(window, 800, 600);
+    FramebufferSizeCallback(window, 800, 800);
 
     const GLubyte *vendor      = glGetString(GL_VENDOR);
     const GLubyte *renderer    = glGetString(GL_RENDERER);
@@ -71,8 +76,12 @@ int main(int argc, char* argv[])
 
     while (!glfwWindowShouldClose(window))
     {
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
-
+    glfwTerminate();
     return 0;
 }
 
@@ -101,4 +110,56 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
     // O cast para float é necessário pois números inteiros são arredondados ao
     // serem divididos!
     g_ScreenRatio = (float)width / height;
+}
+
+// Variáveis globais que armazenam a última posição do cursor do mouse, para
+// que possamos calcular quanto que o mouse se movimentou entre dois instantes
+// de tempo. Utilizadas no callback CursorPosCallback() abaixo.
+double g_LastCursorPosX, g_LastCursorPosY;
+
+// Função callback chamada sempre que o usuário aperta algum dos botões do mouse
+void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    {
+        glfwGetCursorPos(window, &g_LastCursorPosX, &g_LastCursorPosY);
+        g_LeftMouseButtonPressed = true;
+    }
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+    {
+        g_LeftMouseButtonPressed = false;
+    }
+}
+
+// Função callback chamada sempre que o usuário movimentar o cursor do mouse em
+// cima da janela OpenGL.
+void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (g_LeftMouseButtonPressed)
+    {
+    }
+}
+
+// Função callback chamada sempre que o usuário movimenta a "rodinha" do mouse.
+void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    // Atualizamos a distância da câmera para a origem utilizando a
+    // movimentação da "rodinha", simulando um ZOOM.
+    g_CameraDistance -= 0.1f*yoffset;
+
+    // Uma câmera look-at nunca pode estar exatamente "em cima" do ponto para
+    // onde ela está olhando, pois isto gera problemas de divisão por zero na
+    // definição do sistema de coordenadas da câmera. Isto é, a variável abaixo
+    // nunca pode ser zero. Versões anteriores deste código possuíam este bug,
+    // o qual foi detectado pelo aluno Vinicius Fraga (2017/2).
+    const float verysmallnumber = std::numeric_limits<float>::epsilon();
+    if (g_CameraDistance < verysmallnumber)
+        g_CameraDistance = verysmallnumber;
+}
+
+// Definição da função que será chamada sempre que o usuário pressionar alguma
+// tecla do teclado. Veja http://www.glfw.org/docs/latest/input_guide.html#input_key
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
+{
+
 }
