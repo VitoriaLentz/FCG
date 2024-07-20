@@ -173,8 +173,7 @@ int main(int argc, char* argv[])
 
     LoadShadersFromFiles();
     LoadTextureImage("../../data/madeira.jpg");
-    LoadTextureImage("../../data/madeira.jpg");
-    LoadTextureImage("../../data/Texture_chef/chef.jpg");
+    //LoadTextureImage("../../data/chef.jpg");
 
     ObjModel cozinhamodel("../../data/cozinha.obj");
     ComputeNormals(&cozinhamodel);
