@@ -4,9 +4,8 @@
 #	LightWave3D OBJ Export v2.3
 #
 ####
-o apple.obj
 mtllib apple.mtl
-g default
+g maca
 v -0.0496454 0.0477619 0.00535553
 v -0.0496237 0.0489329 0.00415937
 v -0.0495773 0.0459956 0.00250281

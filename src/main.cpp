@@ -24,7 +24,9 @@
 
 float g_ScreenRatio = 1.0f;
 bool g_LeftMouseButtonPressed = false;
-float g_CameraDistance = 3.5f;
+float g_CameraTheta = 0.0f; // Ângulo no plano ZX em relação ao eixo Z
+float g_CameraPhi = 0.0f;   // Ângulo em relação ao eixo Y
+float g_CameraDistance = 3.5f; // Distância da câmera para a origem
 GLuint g_GpuProgramID = 0;
 GLint g_model_uniform;
 GLint g_view_uniform;
@@ -169,11 +171,71 @@ int main(int argc, char* argv[])
 
     printf("GPU: %s, %s, OpenGL %s, GLSL %s\n", vendor, renderer, glversion, glslversion);
 
+    LoadShadersFromFiles();
+    LoadTextureImage("../../data/madeira.jpg");
+    LoadTextureImage("../../data/madeira.jpg");
+    LoadTextureImage("../../data/Texture_chef/chef.jpg");
 
+    ObjModel cozinhamodel("../../data/cozinha.obj");
+    ComputeNormals(&cozinhamodel);
+    BuildTrianglesAndAddToVirtualScene(&cozinhamodel);
+
+    ObjModel mesamodel("../../data/mesa.obj");
+    ComputeNormals(&mesamodel);
+    BuildTrianglesAndAddToVirtualScene(&mesamodel);
+
+    ObjModel chefmodel("../../data/chef.obj");
+    ComputeNormals(&chefmodel);
+    BuildTrianglesAndAddToVirtualScene(&chefmodel);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
     while (!glfwWindowShouldClose(window))
     {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glUseProgram(g_GpuProgramID);
+
+        float r = g_CameraDistance;
+        float y = r*sin(g_CameraPhi);
+        float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
+        float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
+
+        glm::vec4 camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
+        glm::vec4 camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+        glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
+        glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+
+        glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
+
+        glm::mat4 projection;
+        float nearplane = -0.1f;  // Posição do "near plane"
+        float farplane  = -10.0f; // Posição do "far plane"
+        float field_of_view = 3.141592 / 3.0f;
+        projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
+
+        glm::mat4 model = Matrix_Identity(); // Transformação identidade de modelagem
+        glUniformMatrix4fv(g_view_uniform       , 1 , GL_FALSE , glm::value_ptr(view));
+        glUniformMatrix4fv(g_projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
+
+        #define COZINHA 0
+        #define MESA 1
+        #define CHEF 2
+
+        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, COZINHA);
+        DrawVirtualObject("cozinha");
+
+        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, MESA);
+        DrawVirtualObject("mesa");
+
+        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        glUniform1i(g_object_id_uniform, CHEF);
+        DrawVirtualObject("chef");
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
