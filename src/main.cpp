@@ -35,6 +35,11 @@ GLint g_object_id_uniform;
 GLint g_bbox_min_uniform;
 GLint g_bbox_max_uniform;
 GLuint g_NumLoadedTextures = 0;
+glm::vec4 camera_position_c  = glm::vec4(0.4f, 0.8f, 0.0f,1.0f); // Ponto "c", centro da câmera
+glm::vec4 camera_lookat_l    = glm::vec4(0.5f, 0.8f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+glm::vec4 camera_view_vector = normalize(camera_lookat_l - camera_position_c); // Vetor "view", sentido para onde a câmera está virada
+glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+
 
 struct SceneObject
 {
@@ -197,16 +202,7 @@ int main(int argc, char* argv[])
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(g_GpuProgramID);
 
-        float r = g_CameraDistance;
-        float y = r*sin(g_CameraPhi);
-        float z = r*cos(g_CameraPhi)*cos(g_CameraTheta);
-        float x = r*cos(g_CameraPhi)*sin(g_CameraTheta);
-
-        glm::vec4 camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
-        glm::vec4 camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-        glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
-        glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
-
+        camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
         glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
 
         glm::mat4 projection;
@@ -318,7 +314,33 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 // tecla do teclado. Veja http://www.glfw.org/docs/latest/input_guide.html#input_key
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 {
+    // Se o usuário pressionar a tecla ESC, fechamos a janela.
+    if (key == GLFW_KEY_ESCAPE)
+        glfwSetWindowShouldClose(window, GL_TRUE);
 
+    float delta = 3.141592 / 60; // 22.5 graus, em radianos.
+    float cameraSpeed = 1.0f;
+    glm::vec4 w = -(normalize(camera_view_vector));
+    glm::vec4 u = normalize(crossproduct(camera_up_vector, w));
+
+    if (key == GLFW_KEY_LEFT)
+    {
+        camera_position_c -= u * cameraSpeed * delta;
+    }
+
+    if (key == GLFW_KEY_RIGHT)
+    {
+        camera_position_c += u * cameraSpeed * delta;
+    }
+    if (key == GLFW_KEY_UP)
+    {
+        camera_position_c += w * cameraSpeed * delta;
+    }
+        if (key == GLFW_KEY_DOWN)
+    {
+        camera_position_c -= w * cameraSpeed * delta;
+    }
+    camera_position_c.y = 0.8f;
 }
 
 // Função que carrega uma imagem para ser utilizada como textura
