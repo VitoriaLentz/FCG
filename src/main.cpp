@@ -19,6 +19,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <tiny_obj_loader.h>
 #include <stb_image.h>
+#include <time.h>
 #include "utils.h"
 #include "matrices.h"
 
@@ -39,7 +40,6 @@ glm::vec4 camera_position_c  = glm::vec4(0.4f, 0.8f, 0.0f,1.0f); // Ponto "c", c
 glm::vec4 camera_lookat_l    = glm::vec4(0.5f, 0.8f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
 glm::vec4 camera_view_vector = normalize(camera_lookat_l - camera_position_c); // Vetor "view", sentido para onde a câmera está virada
 glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
-
 
 struct SceneObject
 {
@@ -178,6 +178,10 @@ int main(int argc, char* argv[])
 
     LoadShadersFromFiles();
     LoadTextureImage("../../data/madeira.jpg");
+    LoadTextureImage("../../data/banana.png");
+    LoadTextureImage("../../data/maca.jpg");
+    LoadTextureImage("../../data/abacaxi.jpg");
+    LoadTextureImage("../../data/laranja.jpg");
     //LoadTextureImage("../../data/chef.jpg");
 
     ObjModel cozinhamodel("../../data/cozinha.obj");
@@ -192,10 +196,28 @@ int main(int argc, char* argv[])
     ComputeNormals(&chefmodel);
     BuildTrianglesAndAddToVirtualScene(&chefmodel);
 
+    ObjModel bananamodel("../../data/banana.obj");
+    ComputeNormals(&bananamodel);
+    BuildTrianglesAndAddToVirtualScene(&bananamodel);
+
+    ObjModel macamodel("../../data/maca.obj");
+    ComputeNormals(&macamodel);
+    BuildTrianglesAndAddToVirtualScene(&macamodel);
+
+    ObjModel abacaximodel("../../data/abacaxi.obj");
+    ComputeNormals(&abacaximodel);
+    BuildTrianglesAndAddToVirtualScene(&abacaximodel);
+
+    ObjModel laranjamodel("../../data/laranja.obj");
+    ComputeNormals(&laranjamodel);
+    BuildTrianglesAndAddToVirtualScene(&laranjamodel);
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
+    clock_t begin_time = clock();
+    int fruit = 0;
     while (!glfwWindowShouldClose(window))
     {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -207,7 +229,7 @@ int main(int argc, char* argv[])
 
         glm::mat4 projection;
         float nearplane = -0.1f;  // Posição do "near plane"
-        float farplane  = -10.0f; // Posição do "far plane"
+        float farplane  = -100.0f; // Posição do "far plane"
         float field_of_view = 3.141592 / 3.0f;
         projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
 
@@ -217,8 +239,17 @@ int main(int argc, char* argv[])
 
         #define COZINHA 0
         #define MESA 1
-        #define CHEF 2
+        #define BANANA 2
+        #define MACA 3
+        #define ABACAXI 4
+        #define LARANJA 5
 
+        //#define CHEF 2
+
+        model = Matrix_Identity();
+        model[3][1]=-2.0;
+        model[3][0]=-2.0;
+        model = model*Matrix_Scale(3.0f, 6.0f, 6.0f)*Matrix_Rotate_Y(1.6f)*Matrix_Translate(0.0f,0.0f,2.0f);
         glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, COZINHA);
         DrawVirtualObject("cozinha");
@@ -227,9 +258,54 @@ int main(int argc, char* argv[])
         glUniform1i(g_object_id_uniform, MESA);
         DrawVirtualObject("mesa");
 
-        glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, CHEF);
-        DrawVirtualObject("chef");
+
+        if((float( clock () - begin_time ) /  CLOCKS_PER_SEC) > 5)
+        {
+            begin_time = clock();
+            fruit = rand() % 4 + 1;
+        }
+
+        switch(fruit)
+        {
+        case 1:
+            model=Matrix_Identity();
+            model[3][2]=4.0;
+            model[3][0]=6.0;
+            model = model*Matrix_Scale(0.4f, 0.4f, 0.4f);
+            glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(g_object_id_uniform, BANANA);
+            DrawVirtualObject("Banana");
+            break;
+        case 2:
+            model=Matrix_Identity();
+            model[3][2]=2.0;
+            model[3][0]=6.0;
+            model = model*Matrix_Scale(4.0f, 4.0f, 4.0f);
+            glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(g_object_id_uniform, MACA);
+            DrawVirtualObject("maca");
+            break;
+        case 3:
+            model=Matrix_Identity();
+            model[3][2]=0.0;
+            model[3][0]=6.0;
+            model = model*Matrix_Scale(0.04f, 0.04f, 0.04f);
+            glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(g_object_id_uniform, ABACAXI);
+            DrawVirtualObject("Pineapple");
+            break;
+        case 4:
+            model=Matrix_Identity();
+            model[3][2]=-2.0;
+            model[3][0]=6.0;
+            model = model*Matrix_Scale(0.05f, 0.05f, 0.05f);
+            glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+            glUniform1i(g_object_id_uniform, LARANJA);
+            DrawVirtualObject("Orange");
+        }
+        //glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
+        //glUniform1i(g_object_id_uniform, CHEF);
+        //DrawVirtualObject("chef");
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -334,11 +410,11 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     }
     if (key == GLFW_KEY_UP)
     {
-        camera_position_c += w * cameraSpeed * delta;
+        camera_position_c -= w * cameraSpeed * delta;
     }
         if (key == GLFW_KEY_DOWN)
     {
-        camera_position_c -= w * cameraSpeed * delta;
+        camera_position_c += w * cameraSpeed * delta;
     }
     camera_position_c.y = 0.8f;
 }
