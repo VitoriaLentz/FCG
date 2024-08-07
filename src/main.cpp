@@ -122,8 +122,10 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
-void PushMatrix(glm::mat4 M);
-void PopMatrix(glm::mat4& M);
+
+// Resolução inicial da janela
+int initial_width = 1280;
+int initial_height = 720; // 16:9
 
 void BuildTrianglesAndAddToVirtualScene(ObjModel*); // Constrói representação de um ObjModel como malha de triângulos para renderização
 void ComputeNormals(ObjModel* model); // Computa normais de um ObjModel, caso não existam.
@@ -135,6 +137,25 @@ GLuint LoadShader_Fragment(const char* filename); // Carrega um fragment shader
 void LoadShader(const char* filename, GLuint shader_id); // Função utilizada pelas duas acima
 GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Cria um programa de GPU
 void PrintObjModelInfo(ObjModel*); // Função para debugging
+
+// Declaração de funções auxiliares para renderizar texto dentro da janela
+// OpenGL. Estas funções estão definidas no arquivo "textrendering.cpp".
+void TextRendering_Init();
+float TextRendering_LineHeight(GLFWwindow* window);
+float TextRendering_CharWidth(GLFWwindow* window);
+void TextRendering_PrintString(GLFWwindow* window, const std::string &str, float x, float y, float scale = 1.0f);
+void TextRendering_PrintMatrix(GLFWwindow* window, glm::mat4 M, float x, float y, float scale = 1.0f);
+void TextRendering_PrintVector(GLFWwindow* window, glm::vec4 v, float x, float y, float scale = 1.0f);
+void TextRendering_PrintMatrixVectorProduct(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f);
+void TextRendering_PrintMatrixVectorProductMoreDigits(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f);
+void TextRendering_PrintMatrixVectorProductDivW(GLFWwindow* window, glm::mat4 M, glm::vec4 v, float x, float y, float scale = 1.0f);
+
+// Funções abaixo renderizam como texto na janela OpenGL algumas matrizes e
+// outras informações do programa. Definidas após main().
+// void TextRendering_ShowModelViewProjection(GLFWwindow* window, glm::mat4 projection, glm::mat4 view, glm::mat4 model, glm::vec4 p_model);
+// void TextRendering_ShowEulerAngles(GLFWwindow* window);
+// void TextRendering_ShowProjection(GLFWwindow* window);
+void TextRendering_ShowFramesPerSecond(GLFWwindow* window);
 
 int main(int argc, char* argv[])
 {
@@ -149,6 +170,9 @@ int main(int argc, char* argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
+    #ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    #endif
 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     GLFWwindow* window;
@@ -167,8 +191,9 @@ int main(int argc, char* argv[])
     glfwMakeContextCurrent(window);
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
     glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
-    FramebufferSizeCallback(window, 800, 800);
+    FramebufferSizeCallback(window, initial_width, initial_height);
 
+    // Imprimimos no terminal informações sobre a GPU do sistema
     const GLubyte *vendor      = glGetString(GL_VENDOR);
     const GLubyte *renderer    = glGetString(GL_RENDERER);
     const GLubyte *glversion   = glGetString(GL_VERSION);
@@ -176,13 +201,17 @@ int main(int argc, char* argv[])
 
     printf("GPU: %s, %s, OpenGL %s, GLSL %s\n", vendor, renderer, glversion, glslversion);
 
+    // Carregamos os shaders de vértices e de fragmentos que serão utilizados
+    // para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
     LoadShadersFromFiles();
+
+    // Carregamos imagens para serem utilizadas como textura
     LoadTextureImage("../../data/madeira.jpg");
     LoadTextureImage("../../data/banana.png");
     LoadTextureImage("../../data/maca.jpg");
     LoadTextureImage("../../data/abacaxi.jpg");
     LoadTextureImage("../../data/laranja.jpg");
-    //LoadTextureImage("../../data/chef.jpg");
+    LoadTextureImage("../../data/chef.jpg");
 
     ObjModel cozinhamodel("../../data/cozinha.obj");
     ComputeNormals(&cozinhamodel);
@@ -212,6 +241,14 @@ int main(int argc, char* argv[])
     ComputeNormals(&laranjamodel);
     BuildTrianglesAndAddToVirtualScene(&laranjamodel);
 
+    if ( argc > 1 )
+    {
+        ObjModel model(argv[1]);
+        BuildTrianglesAndAddToVirtualScene(&model);
+    }
+
+    // Inicializamos o código para renderização de texto.
+    TextRendering_Init();
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -230,7 +267,7 @@ int main(int argc, char* argv[])
         glm::mat4 projection;
         float nearplane = -0.1f;  // Posição do "near plane"
         float farplane  = -100.0f; // Posição do "far plane"
-        float field_of_view = 3.141592 / 3.0f;
+        float field_of_view = M_PI / 3.0f;
         projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
 
         glm::mat4 model = Matrix_Identity(); // Transformação identidade de modelagem
@@ -238,9 +275,9 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(g_projection_uniform , 1 , GL_FALSE , glm::value_ptr(projection));
 
         #define COZINHA 0
-        #define MESA 1
-        #define BANANA 2
-        #define MACA 3
+        #define MESA    1
+        #define BANANA  2
+        #define MACA    3
         #define ABACAXI 4
         #define LARANJA 5
 
@@ -283,7 +320,7 @@ int main(int argc, char* argv[])
             model = model*Matrix_Scale(4.0f, 4.0f, 4.0f);
             glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
             glUniform1i(g_object_id_uniform, MACA);
-            DrawVirtualObject("maca");
+            DrawVirtualObject("Maca");
             break;
         case 3:
             model=Matrix_Identity();
@@ -303,16 +340,19 @@ int main(int argc, char* argv[])
             glUniform1i(g_object_id_uniform, LARANJA);
             DrawVirtualObject("Orange");
         }
-        //glUniformMatrix4fv(g_model_uniform, 1 , GL_FALSE , glm::value_ptr(model));
-        //glUniform1i(g_object_id_uniform, CHEF);
-        //DrawVirtualObject("chef");
-
+        
+        // Imprimimos na tela informação sobre o número de quadros renderizados
+        // por segundo (frames per second).
+        TextRendering_ShowFramesPerSecond(window);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
     glfwTerminate();
     return 0;
 }
+
+// Variável que controla se o texto informativo será mostrado na tela.
+bool g_ShowInfoText = true;
 
 // Definimos o callback para impressão de erros da GLFW no terminal
 void ErrorCallback(int error, const char* description)
@@ -929,5 +969,41 @@ GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id)
 
     // Retornamos o ID gerado acima
     return program_id;
+}
+
+// Escrevemos na tela o número de quadros renderizados por segundo (frames per
+// second).
+void TextRendering_ShowFramesPerSecond(GLFWwindow* window)
+{
+    if ( !g_ShowInfoText )
+        return;
+
+    // Variáveis estáticas (static) mantém seus valores entre chamadas
+    // subsequentes da função!
+    static float old_seconds = (float)glfwGetTime();
+    static int   ellapsed_frames = 0;
+    static char  buffer[20] = "?? fps";
+    static int   numchars = 7;
+
+    ellapsed_frames += 1;
+
+    // Recuperamos o número de segundos que passou desde a execução do programa
+    float seconds = (float)glfwGetTime();
+
+    // Número de segundos desde o último cálculo do fps
+    float ellapsed_seconds = seconds - old_seconds;
+
+    if ( ellapsed_seconds > 1.0f )
+    {
+        numchars = snprintf(buffer, 20, "%.2f fps", ellapsed_frames / ellapsed_seconds);
+    
+        old_seconds = seconds;
+        ellapsed_frames = 0;
+    }
+
+    float lineheight = TextRendering_LineHeight(window);
+    float charwidth = TextRendering_CharWidth(window);
+
+    TextRendering_PrintString(window, buffer, 1.0f-(numchars + 1)*charwidth, 1.0f-lineheight, 1.0f);
 }
 
