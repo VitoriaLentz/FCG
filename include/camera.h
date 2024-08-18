@@ -11,12 +11,12 @@ class Camera {
         bool useFreeCamera;
         float nearPlane;
         float farPlane;
-        glm::vec4 viewVector;     
+        glm::vec4 viewVector;
         glm::vec4 lookAt;
         glm::vec4 upVector;
         bool up, down, left, right, ataque;
         float phi, theta, distance;
-
+        //FONTE: laborat�rios da disciplina
         Camera();
         glm::mat4 getView();
         void updateViewVector();

@@ -24,6 +24,7 @@ class Render{
         GLint g_bbox_min_uniform;
         GLint g_bbox_max_uniform;
         GLuint g_NumLoadedTextures = 0;
+        //FONTE: laboratórios da disciplina
         void DrawVirtualObject(const char* object_name); // Desenha um objeto armazenado em g_VirtualScene
         GLuint LoadShader_Vertex(const char* filename);   // Carrega um vertex shader
         GLuint LoadShader_Fragment(const char* filename); // Carrega um fragment shader

@@ -15,6 +15,7 @@ class Callbacks {
         double g_LastCursorPosY;
         // Funções callback para comunicação com o sistema operacional e interação do
         // usuário. Veja mais comentários nas definições das mesmas.
+        //FONTE: laboratórios da disciplina
         void FramebufferSizeCallback(int width, int height);
         void ErrorCallback(int error, const char* description);
         void KeyCallback(int key, int scancode, int action, int mode);

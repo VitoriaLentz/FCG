@@ -26,7 +26,7 @@ class ObjModel {
         float rotation;
         glm::vec3 originalPosition;
         Obj obj;
-
+        //FONTE: laboratórios da disciplina
         void BuildTrianglesAndAddToVirtualScene(std::map<std::string, SceneObject> &virtualScene); // Constrói representação de um ObjModel como malha de triângulos para renderização
         void ComputeNormals(); // Computa normais de um ObjModel, caso não existam.
         ObjModel(int id, glm::vec3 position, glm::vec3 scale, glm::vec3 direction, float rotation, const char* name, const char* path, std::map<std::string, SceneObject> &virtualScene);
