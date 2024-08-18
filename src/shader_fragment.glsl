@@ -80,6 +80,20 @@ void main()
     vec3 I = vec3(0.4,0.4,0.4);
     vec3 Ia = vec3(0.2,0.2,0.2);
 
+    if ( object_id == COZINHA )
+    {
+        Kd = texture(TextureCozinha, texcoords).rgb;
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = Kd / 2.0;
+        q = 1.0;
+    }
+    else if ( object_id == CHEF )
+    {
+        Kd = texture(TextureChef, texcoords).rgb;
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = Kd / 2.0;
+        q = 32.0;
+    }
     else if ( object_id == KNIFE )
     {
         Kd = texture(TextureKnife, texcoords).rgb;

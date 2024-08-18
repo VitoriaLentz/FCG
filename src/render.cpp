@@ -255,9 +255,14 @@ void Render::LoadShadersFromFiles()
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(this->g_GpuProgramID);
-    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureImage0"), 0);
-    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureImage1"), 1);
-    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureImage2"), 2);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureCozinha"), 0);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureChef"), 2);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureBanana"), 4);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureMaca"), 5);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureAbacaxi"), 6);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureLaranja"), 7);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureKnife"), 3);
+
     glUseProgram(0);
 }
 

@@ -206,6 +206,8 @@ int main(int argc, char* argv[])
 
     // Carregamos imagens para serem utilizadas como textura
     render.LoadTextureImage("../data/madeira.jpg");
+    render.LoadTextureImage("../data/madeira.jpg");
+    render.LoadTextureImage("../data/chef.jpg");
     render.LoadTextureImage("../data/knife.png");
     render.LoadTextureImage("../data/banana.png");
     render.LoadTextureImage("../data/maca.jpg");
