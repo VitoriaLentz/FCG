@@ -19,9 +19,13 @@ uniform mat4 view;
 uniform mat4 projection;
 
 // Identificador que define qual objeto está sendo desenhado no momento
-#define SPHERE 0
-#define BUNNY  1
-#define PLANE  2
+#define COZINHA 0
+#define CHEF    2
+#define KNIFE   3
+#define BANANA  4
+#define MACA    5
+#define ABACAXI 6
+#define LARANJA 7
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -29,9 +33,13 @@ uniform vec4 bbox_min;
 uniform vec4 bbox_max;
 
 // Variáveis para acesso das imagens de textura
-uniform sampler2D TextureImage0;
-uniform sampler2D TextureImage1;
-uniform sampler2D TextureImage2;
+uniform sampler2D TextureCozinha;
+uniform sampler2D TextureChef;
+uniform sampler2D TextureBanana;
+uniform sampler2D TextureMaca;
+uniform sampler2D TextureAbacaxi;
+uniform sampler2D TextureLaranja;
+uniform sampler2D TextureKnife;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -64,71 +72,63 @@ void main()
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
 
+    vec3 Kd; // Refletância difusa
+    vec3 Ks; // Refletância especular
+    vec3 Ka; // Refletância ambiente
+    float q; // Expoente especular para o modelo de iluminação de Phong
+
     // Coordenadas de textura U e V
     float U = 0.0;
     float V = 0.0;
+    vec4 r = -l + 2 * n * dot(n, l);
+    vec3 I = vec3(0.4,0.4,0.4);
+    vec3 Ia = vec3(0.2,0.2,0.2);
 
-    if ( object_id == SPHERE )
+    else if ( object_id == KNIFE )
     {
-        // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
-        // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
-        // o slides 134-150 do documento Aula_20_Mapeamento_de_Texturas.pdf.
-        // A esfera que define a projeção deve estar centrada na posição
-        // "bbox_center" definida abaixo.
-
-        // Você deve utilizar:
-        //   função 'length( )' : comprimento Euclidiano de um vetor
-        //   função 'atan( , )' : arcotangente. Veja https://en.wikipedia.org/wiki/Atan2.
-        //   função 'asin( )'   : seno inverso.
-        //   constante M_PI
-        //   variável position_model
-        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
-        vec4 p_novo = position_model - bbox_center;
-        float angulo_teta = atan(position_model.x,position_model.z);
-        float angulo_phi = asin(position_model.y/(length(p_novo)));
-
-        U = (angulo_teta + M_PI)/(2.0*M_PI);
-        V = (angulo_phi + M_PI_2)/(M_PI);
+        Kd = texture(TextureKnife, texcoords).rgb;
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = Kd / 2.0;
+        q = 32.0;
     }
-    else if ( object_id == BUNNY )
+    else if ( object_id == BANANA )
     {
-        // PREENCHA AQUI as coordenadas de textura do coelho, computadas com
-        // projeção planar XY em COORDENADAS DO MODELO. Utilize como referência
-        // o slides 99-104 do documento Aula_20_Mapeamento_de_Texturas.pdf,
-        // e também use as variáveis min*/max* definidas abaixo para normalizar
-        // as coordenadas de textura U e V dentro do intervalo [0,1]. Para
-        // tanto, veja por exemplo o mapeamento da variável 'p_v' utilizando
-        // 'h' no slides 158-160 do documento Aula_20_Mapeamento_de_Texturas.pdf.
-        // Veja também a Questão 4 do Questionário 4 no Moodle.
-
-        float minx = bbox_min.x;
-        float maxx = bbox_max.x;
-
-        float miny = bbox_min.y;
-        float maxy = bbox_max.y;
-
-        float minz = bbox_min.z;
-        float maxz = bbox_max.z;
-
-        U = (p.x - minx)/(maxx-minx);
-        V = (p.y - miny)/(maxy-miny);
+        Kd = texture(TextureBanana, texcoords).rgb;
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = Kd / 2.0;
+        q = 32.0;
     }
-    else if ( object_id == PLANE )
+    else if ( object_id == MACA )
     {
-        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
-        U = texcoords.x;
-        V = texcoords.y;
+        Kd = texture(TextureMaca, texcoords).rgb;
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = Kd / 2.0;
+        q = 32.0;
+
     }
+    else if ( object_id == ABACAXI )
+    {
+        Kd = texture(TextureAbacaxi, texcoords).rgb;
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = Kd / 2.0;
+        q = 32.0;
 
-    // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-    vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
-    vec3 Kd1 = texture(TextureImage1, vec2(U,V)).rgb;
+    }
+    else if ( object_id == LARANJA )
+    {
+        Kd = texture(TextureLaranja, texcoords).rgb;
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = Kd / 2.0;
+        q = 32.0;
 
-    // Equação de Iluminação
-    float lambert = max(0,dot(n,l));
-    float lambert1 = min(0,dot(n,l));
-
-        color.rgb = Kd0 * (lambert + 0.01) + Kd1*(-lambert1+0.1);
+    }
+    else
+    {
+        Kd = vec3(0.0,0.0,0.0);
+        Ks = vec3(0.0,0.0,0.0);
+        Ka = vec3(0.0,0.0,0.0);
+        q = 1.0;
+    }
 
     // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
     // necessário:
@@ -146,6 +146,7 @@ void main()
 
     // Cor final com correção gamma, considerando monitor sRGB.
     // Veja https://en.wikipedia.org/w/index.php?title=Gamma_correction&oldid=751281772#Windows.2C_Mac.2C_sRGB_and_TV.2Fvideo_standard_gammas
+    color.rgb = Kd * I * max(0, dot(n, l)) + Ka * Ia + Ks * I * pow(max(0, dot(r, v)), q);
     color.rgb = pow(color.rgb, vec3(1.0,1.0,1.0)/2.2);
 }
 

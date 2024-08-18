@@ -8,8 +8,8 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 
-#include "utils.h"
-#include "dejavufont.h"
+#include "../include/utils.h"
+#include "../include/dejavufont.h"
 
 GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Função definida em main.cpp
 
@@ -117,7 +117,7 @@ void TextRendering_Init()
     texttex_uniform = glGetUniformLocation(textprogram_id, "tex");
     glCheckError();
 
-    GLuint textureunit = 31;
+    GLuint textureunit = this->numLoadedTextures;
     glActiveTexture(GL_TEXTURE0 + textureunit);
     glBindTexture(GL_TEXTURE_2D, texttexture_id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, dejavufont.tex_width, dejavufont.tex_height, 0, GL_RED, GL_UNSIGNED_BYTE, dejavufont.tex_data);
