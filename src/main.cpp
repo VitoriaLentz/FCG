@@ -223,12 +223,22 @@ int main(int argc, char* argv[])
                   render.g_VirtualScene);
     render.models.push_back(cozinhaModel);
 
+    ObjModel chefModel(CHEF,
+                 glm::vec3(0.0f, 0.0f, 0.0f),
+                 glm::vec3(0.4f, 0.4f, 0.4f),
+                 glm::vec3(0.0f, -8.0f, 1.0f),
+                  0.0f,
+                  "chef",
+                  "../data/chef.obj",
+                  render.g_VirtualScene);
+    render.models.push_back(chefModel);
+
     ObjModel knifeModel(KNIFE,
-                 glm::vec3(0.4f, 2.0f, 0.0f),
-                 glm::vec3(1.0f, 1.0f, 1.0f),
-                 glm::vec3(0.0f, 0.0f, 1.0f),
+                 glm::vec3(0.0f, 0.0f, 0.0f),
+                 glm::vec3(0.02f, 0.02f, 0.02f),
+                 glm::vec3(0.0f, 0.0f, 0.0f),
                  0.0f,
-                 "faca",
+                 "Knife_1",
                  "../data/Knife.obj",
                  render.g_VirtualScene);
     render.models.push_back(knifeModel);

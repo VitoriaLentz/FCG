@@ -1,5 +1,7 @@
 #include "../include/objmodel.h"
 #include "glad/glad.h"
+#include "../include/collisions.h"
+#include "../include/matrices.h"
 
 Obj::Obj(){
 
@@ -275,40 +277,4 @@ void ObjModel::BuildTrianglesAndAddToVirtualScene(std::map<std::string, SceneObj
 void ObjModel::updateBbox(){
     this->bbox_max = glm::vec3(this->position.x + this->x_difference, this->position.y, this->position.z + this->z_difference);
     this->bbox_min = glm::vec3(this->position.x - this->x_difference, this->position.y, this->position.z - this->z_difference);
-}
-
-
-void ObjModel::updatechef(float delta_t, Camera &camera, const ObjModel& box) {
-
-    float speed = 20.0f;
-    glm::vec3 newPosition = this->position;
-    this->rotation = atan2f(this->direction.z, this->direction.x) - atan2f(camera.viewVector.z, camera.viewVector.x);
-
-    glm::vec4 w = -(normalize(camera.viewVector));
-    glm::vec4 u = normalize(crossproduct(camera.upVector, w));
-    if (camera.up)
-        newPosition -= glm::vec3(w.x, 0.0f, w.z) * speed * delta_t;
-    if (camera.down)
-        newPosition += glm::vec3(w.x, 0.0f, w.z) * speed * delta_t;
-    if (camera.left)
-        newPosition -= glm::vec3(u.x, 0.0f, u.z) * speed * delta_t;
-    if (camera.right)
-        newPosition += glm::vec3(u.x, 0.0f, u.z) * speed * delta_t;
-
-
-    glm::vec3 newBbox_min = glm::vec3(newPosition.x - this->x_difference, newPosition.y, newPosition.z - this->z_difference);
-    glm::vec3 newBbox_max = glm::vec3(newPosition.x + this->x_difference, newPosition.y, newPosition.z + this->z_difference);
-
-    // Checa colisão com o cenário
-    //if (!collisions::collisionScenario(newBbox_min, newBbox_max, box.bbox_min, box.bbox_max)) {
-        // Caso não ocorre, atualiza a posição do personagem
-     //   this->position = newPosition;
-     //   camera.cartesianPosition = glm::vec4(newPosition.x, newPosition.y + 0.7f, newPosition.z, 1.0f);
-    //}
-
-    if (!camera.useFreeCamera) {
-        glm::vec3 pos = this->position;
-        camera.lookAt = glm::vec4(pos.x, pos.y + 0.7f, pos.z, 1.0f);
-    }
-
 }

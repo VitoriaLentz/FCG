@@ -29,7 +29,6 @@ class ObjModel {
 
         void BuildTrianglesAndAddToVirtualScene(std::map<std::string, SceneObject> &virtualScene); // Constrói representação de um ObjModel como malha de triângulos para renderização
         void ComputeNormals(); // Computa normais de um ObjModel, caso não existam.
-        void updatechef(float delta_t, Camera &camera, const ObjModel& box);
         ObjModel(int id, glm::vec3 position, glm::vec3 scale, glm::vec3 direction, float rotation, const char* name, const char* path, std::map<std::string, SceneObject> &virtualScene);
         float x_difference;
         float z_difference;
