@@ -8,7 +8,7 @@
 
 
 class Callbacks {
-    private:
+    public:
         int _height;
         int _width;
         double g_LastCursorPosX;
@@ -21,8 +21,6 @@ class Callbacks {
         void MouseButtonCallback(int button, int action, int mods);
         void CursorPosCallback(double xpos, double ypos);
         void ScrollCallback(double xoffset, double yoffset);
-
-    public:
         Callbacks();
 };
 
