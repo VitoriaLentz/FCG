@@ -41,8 +41,8 @@ void Camera::updateViewVector(float angleX, float angleY) {
 
 void Camera::updateSphericAngles(float dx, float dy) {
     float newPhi = this->phi + 0.003f * dy;
-    if (newPhi > M_PI_4)
-        newPhi = M_PI_4;
+    if (newPhi > M_PI / 4)
+        newPhi = M_PI / 4;
     if (newPhi < 0)
         newPhi = 0;
     this->phi = newPhi;

@@ -5,11 +5,6 @@
 #include "../include/camera.h"
 #include "../include/glad/glad.h"
 #include "../include/GLFW/glfw3.h"
-#include <cmath>
-#include <cstdio>
-
-#define DOIS_M_PI   6.28318530718
-#define M_PI_2 1.57079632679489661923
 
 #define COZINHA 0
 #define CHEF    2
@@ -70,8 +65,8 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 
     if (camera.useFreeCamera)
     {
-        float angleX = dx/((float) _width/2)  * DOIS_M_PI;
-        float angleY = dy/((float) _height/2) * DOIS_M_PI;
+        float angleX = dx/((float) _width/2)  * M_PI * 2;
+        float angleY = dy/((float) _height/2) * M_PI * 2;
         camera.updateViewVector(angleX, angleY);
         camera.updateSphericAngles(angleX);
     }
@@ -205,15 +200,13 @@ int main(int argc, char* argv[])
     render.LoadShadersFromFiles();
 
     // Carregamos imagens para serem utilizadas como textura
-    render.LoadTextureImage("../data/madeira.jpg");
-    render.LoadTextureImage("../data/madeira.jpg");
-    render.LoadTextureImage("../data/chef.jpg");
-    render.LoadTextureImage("../data/knife.png");
-    render.LoadTextureImage("../data/banana.png");
-    render.LoadTextureImage("../data/maca.jpg");
-    render.LoadTextureImage("../data/abacaxi.jpg");
-    render.LoadTextureImage("../data/laranja.jpg");
-    render.LoadTextureImage("../data/chef.jpg");
+    render.LoadTextureImage("../../data/madeira.jpg");
+    render.LoadTextureImage("../../data/chef.jpg");
+    // render.LoadTextureImage("../../data/knife.png");
+    render.LoadTextureImage("../../data/banana.png");
+    render.LoadTextureImage("../../data/maca.jpg");
+    render.LoadTextureImage("../../data/abacaxi.jpg");
+    render.LoadTextureImage("../../data/laranja.jpg");
 
     ObjModel cozinhaModel(COZINHA,
                   glm::vec3(0.0f, 0.0f, 0.0f),
@@ -221,7 +214,7 @@ int main(int argc, char* argv[])
                   glm::vec3(0.0f, 0.0f, 0.0f),
                   0.0f,
                   "cozinha",
-                  "../data/cozinha.obj",
+                  "../../data/cozinha.obj",
                   render.g_VirtualScene);
     render.models.push_back(cozinhaModel);
 
@@ -231,7 +224,7 @@ int main(int argc, char* argv[])
                  glm::vec3(0.0f, -8.0f, 1.0f),
                   0.0f,
                   "chef",
-                  "../data/chef.obj",
+                  "../../data/chef.obj",
                   render.g_VirtualScene);
     render.models.push_back(chefModel);
 
@@ -241,7 +234,7 @@ int main(int argc, char* argv[])
                  glm::vec3(0.0f, 0.0f, 0.0f),
                  0.0f,
                  "Knife_1",
-                 "../data/Knife.obj",
+                 "../../data/knife.obj",
                  render.g_VirtualScene);
     render.models.push_back(knifeModel);
 
@@ -251,7 +244,7 @@ int main(int argc, char* argv[])
                  glm::vec3(0.0f, 0.0f, 0.0f),
                  0.0f,
                  "Banana",
-                 "../data/banana.obj",
+                 "../../data/banana.obj",
                  render.g_VirtualScene);
     render.models.push_back(bananaModel);
 
@@ -259,9 +252,9 @@ int main(int argc, char* argv[])
                     glm::vec3(10.0f, 17.7f, 0.0f),
                     glm::vec3(14.0f, 14.0f, 14.0f),
                     glm::vec3(0.0f, 0.0f, 0.0f),
-                    M_PI_2,
+                    M_PI / 2,
                     "maca",
-                    "../data/maca.obj",
+                    "../../data/maca.obj",
                     render.g_VirtualScene);
     render.models.push_back(macaModel);
 
@@ -269,9 +262,9 @@ int main(int argc, char* argv[])
                     glm::vec3(0.0f, 8.0f, 0.0f),
                     glm::vec3(0.1f, 0.1f, 0.1f),
                     glm::vec3(0.0f, 0.0f, 0.0f),
-                    M_PI_2,
+                    M_PI / 2,
                     "Pineapple",
-                    "../data/abacaxi.obj",
+                    "../../data/abacaxi.obj",
                     render.g_VirtualScene);
     render.models.push_back(abacaxiModel);
 
@@ -279,9 +272,9 @@ int main(int argc, char* argv[])
                     glm::vec3(0.0f, 8.0f, 0.0f),
                     glm::vec3(0.2f, 0.2f, 0.2f),
                     glm::vec3(0.0f, 0.0f, 0.0f),
-                    M_PI_2,
+                    M_PI / 2,
                     "Orange",
-                    "../data/laranja.obj",
+                    "../../data/laranja.obj",
                     render.g_VirtualScene);
     render.models.push_back(laranjaModel);
 

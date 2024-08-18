@@ -1,5 +1,6 @@
 #include "../include/render.h"
 #include "../include/collisions.h"
+
 #define COZINHA 0
 #define CHEF    2
 #define KNIFE   3

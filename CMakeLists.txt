@@ -11,11 +11,11 @@ set(SOURCES
   src/stb_image.cpp
   src/glad.c
   src/camera.cpp
+  src/collisions.cpp
+  src/matrices.cpp
   src/sceneobject.cpp
   src/render.cpp
-  include/render.h
   src/objmodel.cpp
-  include/objmodel.h
 )
 
 cmake_minimum_required(VERSION 3.5.0)

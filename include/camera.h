@@ -2,8 +2,6 @@
 #define CAMERA_H_
 #include "matrices.h"
 
-#define M_PI_4 0.78539816339
-
 class Camera {
 
     public:

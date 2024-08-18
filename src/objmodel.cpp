@@ -1,7 +1,8 @@
-#include "../include/objmodel.h"
+#include <stdexcept>
 #include "glad/glad.h"
 #include "../include/collisions.h"
 #include "../include/matrices.h"
+#include "../include/objmodel.h"
 
 Obj::Obj(){
 
