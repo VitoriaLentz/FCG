@@ -11,6 +11,7 @@
 #include <sstream>
 #include <map>
 #include "../include/stb_image.h"
+#define M_PI   3.14159265358979323846
 
 class Render{
     public:

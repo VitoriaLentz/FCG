@@ -344,7 +344,7 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
 
     glm::mat4 model = Matrix_Identity();
     glUniformMatrix4fv(this->g_view_uniform       , 1 , GL_FALSE , glm::value_ptr(camera.getView()));
-    glUniformMatrix4fv(this->g_projection_uniform , 1 , GL_FALSE , glm::value_ptr(camera.getPerspective(aspectRatio)));
+    glUniformMatrix4fv(this->g_projection_uniform , 1 , GL_FALSE , glm::value_ptr(Matrix_Perspective((M_PI / 3.0f), aspectRatio, camera.nearPlane, camera.farPlane)));
 
     float currentTime = glfwGetTime();
     float delta_t = currentTime - initialTime;
@@ -369,7 +369,7 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
     }
 
     camera.updateCamera(delta_t);
-    if (camera.keys.M1) {
+    if (camera.ataque) {
         knifeIsThrown = true;
     }
 

@@ -285,14 +285,14 @@ void ObjModel::updatechef(float delta_t, Camera &camera, const ObjModel& box) {
     this->rotation = atan2f(this->direction.z, this->direction.x) - atan2f(camera.viewVector.z, camera.viewVector.x);
 
     glm::vec4 w = -(normalize(camera.viewVector));
-    glm::vec4 u = normalize(crossproduct(Camera::upVector, w));
-    if (camera.keys.W)
+    glm::vec4 u = normalize(crossproduct(camera.upVector, w));
+    if (camera.up)
         newPosition -= glm::vec3(w.x, 0.0f, w.z) * speed * delta_t;
-    if (camera.keys.S)
+    if (camera.down)
         newPosition += glm::vec3(w.x, 0.0f, w.z) * speed * delta_t;
-    if (camera.keys.A)
+    if (camera.left)
         newPosition -= glm::vec3(u.x, 0.0f, u.z) * speed * delta_t;
-    if (camera.keys.D)
+    if (camera.right)
         newPosition += glm::vec3(u.x, 0.0f, u.z) * speed * delta_t;
 
 

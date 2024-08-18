@@ -8,7 +8,7 @@
 #include <cmath>
 #include <cstdio>
 
-#define M_PI   3.14159265358979323846
+#define DOIS_M_PI   6.28318530718
 #define M_PI_2 1.57079632679489661923
 
 #define COZINHA 0
@@ -56,9 +56,9 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-        camera.keys.M1 = true;
+        camera.ataque = true;
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
-        camera.keys.M1 = false;
+        camera.ataque = false;
 }
 
 // Função callback chamada sempre que o usuário movimentar o cursor do mouse em
@@ -68,10 +68,10 @@ void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     float dx = xpos - g_LastCursorPosX;
     float dy = ypos - g_LastCursorPosY;
 
-    if (camera.isUseFreeCamera())
+    if (camera.useFreeCamera)
     {
-        float angleX = dx/((float) _width/2)  * 2 * M_PI;
-        float angleY = dy/((float) _height/2) * 2 * M_PI;
+        float angleX = dx/((float) _width/2)  * DOIS_M_PI;
+        float angleY = dy/((float) _height/2) * DOIS_M_PI;
         camera.updateViewVector(angleX, angleY);
         camera.updateSphericAngles(angleX);
     }
@@ -95,35 +95,35 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
     if (key == GLFW_KEY_C && action == GLFW_PRESS)
-        camera.revertFreeCamera();
+        camera.useFreeCamera = !camera.useFreeCamera;
 
     glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     switch (key)
     {
         case GLFW_KEY_UP:
             if (action == GLFW_PRESS)
-                camera.keys.W = true;
+                camera.up = true;
             else if (action == GLFW_RELEASE)
-                camera.keys.W = false;
+                camera.up = false;
             break;
         case GLFW_KEY_LEFT:
             if (action == GLFW_PRESS)
-                camera.keys.A = true;
+                camera.left = true;
             else if (action == GLFW_RELEASE)
-                camera.keys.A = false;
+                camera.left = false;
         break;
         case GLFW_KEY_DOWN:
             if (action == GLFW_PRESS)
-                camera.keys.S = true;
+                camera.down = true;
             else if (action == GLFW_RELEASE)
-                camera.keys.S = false;
+                camera.down = false;
 
             break;
         case GLFW_KEY_RIGHT:
             if (action == GLFW_PRESS)
-                camera.keys.D = true;
+                camera.right = true;
             else if (action == GLFW_RELEASE)
-                camera.keys.D = false;
+                camera.right = false;
             break;
     };
 }
