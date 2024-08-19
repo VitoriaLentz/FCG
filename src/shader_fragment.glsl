@@ -85,7 +85,7 @@ void main()
         Kd = texture(TextureCozinha, texcoords).rgb;
         Ks = vec3(0.8,0.8,0.8);
         Ka = Kd / 2.0;
-        q = 1.0;
+        q = 32.0;
     }
     else if ( object_id == CHEF )
     {
