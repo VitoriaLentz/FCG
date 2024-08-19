@@ -366,10 +366,6 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
         for(int i=1; i<5; i++){
             fruit.type = i+3;
             fruit.position = glm::vec3(5.0f, 5.0f, i*3.0f-6.0f);
-            fruit.bbox_max = glm::vec3(fruit.position.x, fruit.position.y + this->models[BANANA].x_difference,
-                                            fruit.position.z);
-            fruit.bbox_min = glm::vec3(fruit.position.x, fruit.position.y - this->models[BANANA].x_difference,
-                                            fruit.position.z);
             fruits.push_back(fruit);
         }
         spawnTime = currentTime;
@@ -386,7 +382,8 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
             if (Kill && !ataque) {
                 object.position = this->models[CHEF].position;
                 object.originalPosition = object.position;
-                object.updateBbox();
+                object.bbox_max = object.position;
+                object.bbox_min = object.position;
                 object.direction = normalize(glm::vec3(1.0f, 1.0 * cos(this->models[CHEF].rotation) + 1.0 * sin(this->models[CHEF].rotation), 0.0f));
                 if (camera.ataque)
                     ataque = true;
@@ -394,22 +391,19 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
             if (ataque) {
                 Kill= false;
                 object.position = object.position + object.direction * delta_t * Speed;
-
-                //if (!collisions::CubeToBox(object.bbox_min, object.bbox_max, this->models[COZINHA].bbox_min, this->models[COZINHA].bbox_max)) {
-                    model = Matrix_Translate(object.position.x, object.position.y, object.position.z);
-                    model *= Matrix_Scale(object.scale.x, object.scale.y, object.scale.z);
-                    model *= Matrix_Rotate_Z(0.5);
-                    object.updateBbox();
-                    glUniformMatrix4fv(this->g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-                    glUniform1i(this->g_object_id_uniform, KNIFE);
-                    this->DrawVirtualObject(object.name.c_str());
-                //}
+                model = Matrix_Translate(object.position.x, object.position.y, object.position.z);
+                model *= Matrix_Scale(object.scale.x, object.scale.y, object.scale.z);
+                model *= Matrix_Rotate_Z(0.5);
+                object.bbox_max = object.position;
+                object.bbox_min = object.position;
+                glUniformMatrix4fv(this->g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+                glUniform1i(this->g_object_id_uniform, KNIFE);
+                this->DrawVirtualObject(object.name.c_str());
             }
             else
                 ataque = false;
         }
         else if (object.objectId >= 4) {
-            float delta_z = this->models[object.objectId].x_difference;
 
             for (int i = 0; i < int(fruits.size()); i++) {
             if(object.objectId==fruits[i].type)
@@ -418,13 +412,6 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
                     printf("Você perdeu! Uma fruta caiu no chão. Seu score foi de: %d\n", fruitsPart);
                     return false;
                 }
-
-                /*if (collisions::collisionKnife(fruits[i].bbox_min, fruits[i].bbox_max, this->models[KNIFE].bbox_min, this->models[KNIFE].bbox_max)
-                    && ataque) {
-                    fruits.erase(fruits.begin() + i);
-                    fruitsPart++;
-                    continue;
-                }*/
 
                 fruits[i].position = fruits[i].position - glm::vec3(0.0f, 8.0f, 0.0f) * delta_t * fruits[i].speed;
                 fruits[i].bbox_max = glm::vec3(fruits[i].position.x, fruits[i].position.y, fruits[i].position.z);
@@ -469,9 +456,6 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
                     object.position.z += u.z * movee;
                 }
                 object.position.y = 1.0f;
-
-                glm::vec3 newBbox_min = glm::vec3(object.position.x - object.x_difference, object.position.y, object.position.z - object.z_difference);
-                glm::vec3 newBbox_max = glm::vec3(object.position.x + object.x_difference, object.position.y, object.position.z +object.z_difference);
                 camera.cartesianPosition = glm::vec4(object.position.x + 1.0f, object.position.y + 2.0f, object.position.z, 1.0f);
 
                 if (!camera.useFreeCamera) {
@@ -482,7 +466,8 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
 
             model = Matrix_Translate(object.position.x, object.position.y, object.position.z);
             model *= Matrix_Scale(object.scale.x, object.scale.y, object.scale.z);
-            object.updateBbox();
+            object.bbox_max = object.position;
+            object.bbox_min = object.position;
 
             glUniformMatrix4fv(this->g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
             glUniform1i(this->g_object_id_uniform, object.objectId);

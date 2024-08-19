@@ -274,8 +274,3 @@ void ObjModel::BuildTrianglesAndAddToVirtualScene(std::map<std::string, SceneObj
     // alterar o mesmo. Isso evita bugs.
     glBindVertexArray(0);
 }
-
-void ObjModel::updateBbox(){
-    this->bbox_max = glm::vec3(this->position.x + this->x_difference, this->position.y, this->position.z + this->z_difference);
-    this->bbox_min = glm::vec3(this->position.x - this->x_difference, this->position.y, this->position.z - this->z_difference);
-}
