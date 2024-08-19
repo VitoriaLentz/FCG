@@ -1,5 +1,4 @@
 #include "../include/render.h"
-#include "../include/collisions.h"
 
 #define COZINHA 0
 #define CHEF    2
@@ -378,7 +377,7 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
 
     for (ObjModel &object : this->models) {
         if (object.objectId == KNIFE) {
-            float Speed = 2.0f;
+            float Speed = 5.0f;
             if (Kill && !ataque) {
                 object.position = this->models[CHEF].position;
                 object.originalPosition = object.position;
@@ -391,9 +390,10 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
             if (ataque) {
                 Kill= false;
                 object.position = object.position + object.direction * delta_t * Speed;
+                object.position.y = 2.0f;
                 model = Matrix_Translate(object.position.x, object.position.y, object.position.z);
                 model *= Matrix_Scale(object.scale.x, object.scale.y, object.scale.z);
-                model *= Matrix_Rotate_Z(0.5);
+                model *= Matrix_Rotate_Z(Speed*currentTime);
                 object.bbox_max = object.position;
                 object.bbox_min = object.position;
                 glUniformMatrix4fv(this->g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));

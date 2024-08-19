@@ -1,7 +1,7 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 #include "matrices.h"
-
+#define M_PI   3.14159265358979323846
 class Camera {
 
     public:
