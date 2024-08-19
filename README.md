@@ -26,12 +26,16 @@ Foi usado o chatGPT para ajudar na parte da lógica de spawn das frutas e do mov
 O projeto foi iniciado sob o código dos laboratórios, por isso, muito do código é idêntico. A partir dele, foi primeiro feito a modelagem dos objetos na tela.
 Após acertar os lugares dos objetos e a textura, foi feito o movimento das frutas. Com isso, o código de score e de aumento de velocidade com o passar das fases foi criado.
 Em seguida, o movimento de camera foi criado, juntando a camera look-at e a livre no código. Nessa parte, o chef ainda não tinha sido criado. Somente após a camera se mover, o chef foi colocado em cena.
+
+![image](https://github.com/user-attachments/assets/32df3055-ee7a-4989-8a38-08e1650b937e)
+
+
 Por ultimo, a faca foi colocada no jogo, fazendo um movimento rotacional vertical em direção a parede das frutas.
 Alguns bugs foram corrigidos no final, como o problema de texturas das frutas, mas o chef continua com problemas na textura.
 
-
-
 Tentamos implementar a colisão, mas não funcionou. Tentamos pegar o código da internet, só para ver se funcionaria com ele, mas não funcionou. Então não demos continuidade a essa parte.
+
+
 ![image](https://github.com/user-attachments/assets/0b06bd30-ca78-4a85-8a7e-c4ae57a0cf79)
 
 ### MANUAL ###
