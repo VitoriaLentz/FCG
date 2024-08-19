@@ -6,16 +6,15 @@
 # Arquivos fonte C/C++. Inclua nesta lista todos os arquivos que devem
 # ser compilados.
 set(SOURCES
-  src/main.cpp
-  src/tiny_obj_loader.cpp
-  src/stb_image.cpp
-  src/glad.c
   src/camera.cpp
-  src/collisions.cpp
+  src/glad.c
+  src/main.cpp
   src/matrices.cpp
-  src/sceneobject.cpp
-  src/render.cpp
   src/objmodel.cpp
+  src/render.cpp
+  src/sceneobject.cpp
+  src/stb_image.cpp
+  src/tiny_obj_loader.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)

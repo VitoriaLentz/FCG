@@ -1,12 +1,13 @@
 #include "../include/render.h"
 
-#define COZINHA 0
-#define CHEF    2
-#define KNIFE   3
-#define BANANA  4
-#define MACA    5
-#define ABACAXI 6
-#define LARANJA 7
+#define COZINHA  0 
+#define CHEF     2
+#define KNIFE    3
+#define BANANA   4
+#define MACA     5
+#define ABACAXI  6
+#define LARANJA  7
+#define MELANCIA 8
 
 Render::Render() {
 
@@ -255,13 +256,14 @@ void Render::LoadShadersFromFiles()
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(this->g_GpuProgramID);
-    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureCozinha"), 0);
-    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureChef"), 2);
-    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureBanana"), 4);
-    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureMaca"), 5);
-    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureAbacaxi"), 6);
-    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureLaranja"), 7);
-    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureKnife"), 3);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureCozinha"), COZINHA);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureChef"), CHEF);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureKnife"), KNIFE);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureBanana"), BANANA);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureMaca"), MACA);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureAbacaxi"), ABACAXI);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureLaranja"), LARANJA);
+    glUniform1i(glGetUniformLocation(this->g_GpuProgramID, "TextureMelancia"), MELANCIA);
 
     glUseProgram(0);
 }
@@ -318,7 +320,7 @@ struct Fruit {
 
 };
 
-bool Kill, ataque = false;
+bool kill, ataque = false;
 int phase = 0, fruitsPart = 0;
 std::vector<Fruit> fruits;
 
@@ -328,7 +330,6 @@ bool collisionScenario(glm::vec3 cubeBbox_min, glm::vec3 cubeBbox_max, glm::vec3
     }
     return true;
 }
-
 
 bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectRatio, float &initialTime, float &spawnTime) {
     // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
@@ -362,9 +363,9 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
         Fruit fruit;
         fruit.speed = (1.0f + (float) phase)/20.0f;
         fruit.direction = glm::vec3(0.0f, 1.0f, 0.0f);
-        for(int i=1; i<5; i++){
+        for(int i=1; i<6; i++){
             fruit.type = i+3;
-            fruit.position = glm::vec3(5.0f, 5.0f, i*3.0f-6.0f);
+            fruit.position = glm::vec3(5.0f, 5.0f, i * 3.0f-9.0f);
             fruits.push_back(fruit);
         }
         spawnTime = currentTime;
@@ -372,13 +373,13 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
 
     camera.updateCamera(delta_t);
     if (camera.ataque) {
-        Kill = true;
+        kill = true;
     }
 
     for (ObjModel &object : this->models) {
         if (object.objectId == KNIFE) {
             float Speed = 5.0f;
-            if (Kill && !ataque) {
+            if (kill && !ataque) {
                 object.position = this->models[CHEF].position;
                 object.originalPosition = object.position;
                 object.bbox_max = object.position;
@@ -388,7 +389,7 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
                     ataque = true;
             }
             if (ataque) {
-                Kill= false;
+                kill= false;
                 object.position = object.position + object.direction * delta_t * Speed;
                 object.position.y = 2.0f;
                 model = Matrix_Translate(object.position.x, object.position.y, object.position.z);
@@ -402,58 +403,62 @@ bool Render::LoadWindow(GLFWwindow* window, Camera &camera, const float &aspectR
             }
             else
                 ataque = false;
-        }
-        else if (object.objectId >= 4) {
-
+        } else if (object.objectId >= 4) {
             for (int i = 0; i < int(fruits.size()); i++) {
-            if(object.objectId==fruits[i].type)
-            {
-                if (collisionScenario(fruits[i].bbox_min, fruits[i].bbox_max, this->models[COZINHA].bbox_min, this->models[COZINHA].bbox_max)) {
-                    printf("Você perdeu! Uma fruta caiu no chão. Seu score foi de: %d\n", fruitsPart);
-                    return false;
+                if(object.objectId==fruits[i].type) {
+                    if (collisionScenario(fruits[i].bbox_min, fruits[i].bbox_max, this->models[COZINHA].bbox_min, this->models[COZINHA].bbox_max)) {
+                        printf("Você perdeu! Uma fruta caiu no chão. Seu score foi de: %d\n", fruitsPart);
+                        return false;
+                    }
+
+                    /*if (collisions::collisionKnife(fruits[i].bbox_min, fruits[i].bbox_max, this->models[KNIFE].bbox_min, this->models[KNIFE].bbox_max)
+                        && ataque) {
+                        fruits.erase(fruits.begin() + i);
+                        fruitsPart++;
+                        continue;
+                    }*/
+
+                    fruits[i].position = fruits[i].position - glm::vec3(0.0f, 8.0f, 0.0f) * delta_t * fruits[i].speed;
+                    fruits[i].bbox_max = glm::vec3(fruits[i].position.x, fruits[i].position.y, fruits[i].position.z);
+                    fruits[i].bbox_min = glm::vec3(fruits[i].position.x, fruits[i].position.y, fruits[i].position.z);
+
+                    model = Matrix_Translate(fruits[i].position.x, fruits[i].position.y, fruits[i].position.z);
+                    model *= Matrix_Scale(object.scale.x, object.scale.y, object.scale.z);
+                    model *= Matrix_Rotate_X(0.1f * currentTime);
+                    model *= Matrix_Rotate_Y(0.2f * currentTime);
+                    model *= Matrix_Rotate_Z(0.3f * currentTime);
+                    glUniformMatrix4fv(this->g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+                    glUniform1i(this->g_object_id_uniform, object.objectId);
+                    this->DrawVirtualObject(object.name.c_str());
                 }
-
-                fruits[i].position = fruits[i].position - glm::vec3(0.0f, 8.0f, 0.0f) * delta_t * fruits[i].speed;
-                fruits[i].bbox_max = glm::vec3(fruits[i].position.x, fruits[i].position.y, fruits[i].position.z);
-                fruits[i].bbox_min = glm::vec3(fruits[i].position.x, fruits[i].position.y, fruits[i].position.z);
-
-                model = Matrix_Translate(fruits[i].position.x, fruits[i].position.y, fruits[i].position.z);
-                model *= Matrix_Scale(object.scale.x, object.scale.y, object.scale.z);
-                glUniformMatrix4fv(this->g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-                glUniform1i(this->g_object_id_uniform, object.objectId);
-                this->DrawVirtualObject(object.name.c_str());
             }
-            }
-        }
-        else {
-
-            if (object.objectId == CHEF)
-            {
-                float movee = 2.0f * delta_t;
+        } else {
+            if (object.objectId == CHEF) {
+                float move = 2.0f * delta_t;
                 object.rotation = atan2f(1.0f, object.direction.x) - atan2f(camera.viewVector.z, camera.viewVector.x);
                 glm::vec4 w = -(normalize(camera.viewVector));
                 glm::vec4 u = normalize(crossproduct(camera.upVector, w));
                 if (camera.up)
                 {
-                    object.position.x -= w.x * movee;
-                    object.position.z -= w.z * movee;
+                    object.position.x -= w.x * move;
+                    object.position.z -= w.z * move;
                 }
                 if (camera.down)
                 {
-                    object.position.x += w.x * movee;
-                    object.position.z += w.z * movee;
+                    object.position.x += w.x * move;
+                    object.position.z += w.z * move;
 
                 }
                 if (camera.left)
                 {
-                    object.position.x -= u.x * movee;
-                    object.position.z -= u.z * movee;
+                    object.position.x -= u.x * move;
+                    object.position.z -= u.z * move;
 
                 }
                 if (camera.right)
                 {
-                    object.position.x += u.x * movee;
-                    object.position.z += u.z * movee;
+                    object.position.x += u.x * move;
+                    object.position.z += u.z * move;
                 }
                 object.position.y = 1.0f;
                 camera.cartesianPosition = glm::vec4(object.position.x + 1.0f, object.position.y + 2.0f, object.position.z, 1.0f);

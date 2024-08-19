@@ -6,16 +6,18 @@
 #include "../include/glad/glad.h"
 #include "../include/GLFW/glfw3.h"
 
-#define COZINHA 0
-#define CHEF    2
-#define KNIFE   3
-#define BANANA  4
-#define MACA    5
-#define ABACAXI 6
-#define LARANJA 7
+#define COZINHA  0 
+#define CHEF     2
+#define KNIFE    3
+#define BANANA   4
+#define MACA     5
+#define ABACAXI  6
+#define LARANJA  7
+#define MELANCIA 8
 
 int _height = 800;
-int _width = 800;
+int _width = 1400;
+
 Camera camera = Camera();
 Render render = Render();
 // Variáveis globais que armazenam a última posição do cursor do mouse, para
@@ -125,7 +127,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
 
 int main(int argc, char* argv[])
 {
-
     // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
     // sistema operacional, onde poderemos renderizar com OpenGL.
     int success = glfwInit();
@@ -208,10 +209,11 @@ int main(int argc, char* argv[])
     render.LoadTextureImage("../../data/maca.jpg");
     render.LoadTextureImage("../../data/abacaxi.jpg");
     render.LoadTextureImage("../../data/laranja.jpg");
+    render.LoadTextureImage("../../data/melancia.jpg");
 
     ObjModel cozinhaModel(COZINHA,
                   glm::vec3(0.0f, 0.0f, 0.0f),
-                  glm::vec3(8.0f, 8.0f, 8.0f),
+                  glm::vec3(10.0f, 10.0f, 10.0f),
                   glm::vec3(0.0f, 0.0f, 0.0f),
                   0.0f,
                   "cozinha",
@@ -231,7 +233,7 @@ int main(int argc, char* argv[])
 
     ObjModel knifeModel(KNIFE,
                  glm::vec3(0.0f, 0.0f, 0.0f),
-                 glm::vec3(0.02f, 0.02f, 0.02f),
+                 glm::vec3(0.01f, 0.01f, 0.01f),
                  glm::vec3(0.0f, 0.0f, 0.0f),
                  0.0f,
                  "Knife_1",
@@ -279,6 +281,16 @@ int main(int argc, char* argv[])
                     render.g_VirtualScene);
     render.models.push_back(laranjaModel);
 
+    ObjModel melanciaModel(MELANCIA,
+                    glm::vec3(0.0f, 8.0f, 0.0f),
+                    glm::vec3(0.1f, 0.1f, 0.1f),
+                    glm::vec3(0.0f, 0.0f, 0.0f),
+                    M_PI / 2,
+                    "Watermelon",
+                    "../../data/melancia.obj",
+                    render.g_VirtualScene);
+    render.models.push_back(melanciaModel);
+
     // Habilitamos o Z-buffer. Veja slides 104-116 do documento Aula_09_Projecoes.pdf.
     glEnable(GL_DEPTH_TEST);
 
@@ -303,5 +315,3 @@ int main(int argc, char* argv[])
     // Fim do programa
     return 0;
 }
-
-

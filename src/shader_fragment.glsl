@@ -19,13 +19,14 @@ uniform mat4 view;
 uniform mat4 projection;
 
 // Identificador que define qual objeto está sendo desenhado no momento
-#define COZINHA 0
-#define CHEF    2
-#define KNIFE   3
-#define BANANA  4
-#define MACA    5
-#define ABACAXI 6
-#define LARANJA 7
+#define COZINHA  0 
+#define CHEF     2
+#define KNIFE    3
+#define BANANA   4
+#define MACA     5
+#define ABACAXI  6
+#define LARANJA  7
+#define MELANCIA 8
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -40,6 +41,7 @@ uniform sampler2D TextureMaca;
 uniform sampler2D TextureAbacaxi;
 uniform sampler2D TextureLaranja;
 uniform sampler2D TextureKnife;
+uniform sampler2D TextureMelancia;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -127,6 +129,14 @@ void main()
     else if ( object_id == LARANJA )
     {
         Kd = texture(TextureLaranja, texcoords).rgb;
+        Ks = vec3(0.8,0.8,0.8);
+        Ka = Kd / 2.0;
+        q = 32.0;
+
+    }
+    else if ( object_id == MELANCIA )
+    {
+        Kd = texture(TextureMelancia, texcoords).rgb;
         Ks = vec3(0.8,0.8,0.8);
         Ka = Kd / 2.0;
         q = 32.0;

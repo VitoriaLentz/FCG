@@ -3,8 +3,8 @@
 #include "../include/matrices.h"
 #include "../include/objmodel.h"
 
-Obj::Obj(){
-
+Obj::Obj()
+{
 }
 
 Obj::Obj(const char* filename, const char* basepath, bool triangulate)

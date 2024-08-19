@@ -7,7 +7,7 @@ Camera::Camera() {
     this->viewVector = normalize(this->lookAt - this->cartesianPosition);
     this->upVector = glm::vec4(0.0f,1.0f,0.0f,0.0f);
     this->nearPlane = -0.1f;
-    this->farPlane = -100.0f;
+    this->farPlane = -50.0f;
     this->up = false;
     this->down = false;
     this->left = false;
@@ -54,7 +54,7 @@ void Camera::updateSphericAngles(float angle) {
 }
 
 void Camera::updateSphericDistance(float distance) {
-    this->distance -= 0.1f * distance;
+    this->distance -= 0.2f * distance;
     if (this->useFreeCamera)
         this->useFreeCamera = false;
     if (this->distance < 0.5f) {
